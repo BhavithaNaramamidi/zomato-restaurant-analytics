@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 
 from db import get_connection
-import query as q   # IMPORTANT: import whole module
+import query as q
 
 # --------------------------------------------------
 # PAGE CONFIG
@@ -33,7 +33,7 @@ page = st.sidebar.radio(
 )
 
 # --------------------------------------------------
-# GLOBAL FILTERS
+# GLOBAL FILTERS (City + Cost only)
 # --------------------------------------------------
 st.sidebar.markdown("---")
 st.sidebar.subheader("🔍 Global Filters")
@@ -65,7 +65,10 @@ if cost_filter:
 # ==================================================
 if page == "🏠 Executive Overview":
 
-    st.subheader("🏠 Executive Overview (C-Level)")
+    st.subheader("🏠 Executive Overview (C-Level View)")
+
+    # Page-level ranking
+    top_n = st.selectbox("Show Top Restaurants", [5, 10, 20], index=1)
 
     kpi = q.homepage_kpis(filter_query)
 
@@ -94,8 +97,9 @@ if page == "🏠 Executive Overview":
     fig = px.bar(df, x="listed_in_city", y="avg_sentiment", text="restaurants")
     st.plotly_chart(fig, use_container_width=True)
 
-    st.markdown("### ⭐ Recommended Restaurants")
-    st.dataframe(q.top_trusted_restaurants(filter_query), use_container_width=True)
+    st.markdown("### ⭐ Recommended Restaurants (High Rating + High Sentiment)")
+    df = q.top_trusted_restaurants(filter_query)
+    st.dataframe(df.head(top_n), use_container_width=True)
 
 # ==================================================
 # 🚨 PAGE 2 — RISK & OPPORTUNITY
@@ -104,17 +108,23 @@ elif page == "🚨 Risk & Opportunity":
 
     st.subheader("🚨 Risk & Opportunity Analysis")
 
-    st.markdown("### ⚠️ Risky Restaurants")
-    st.dataframe(q.risky_restaurants(filter_query), use_container_width=True)
+    risk_n = st.selectbox("Show Top / Bottom", [5, 10, 20], index=1)
 
-    st.markdown("### 💎 Hidden Gems")
-    st.dataframe(q.hidden_gems(filter_query), use_container_width=True)
+    st.markdown("### ⚠️ Risky Restaurants (High Rating, Low Sentiment)")
+    df = q.risky_restaurants(filter_query)
+    st.dataframe(df.head(risk_n), use_container_width=True)
 
-    st.markdown("### 🌪️ Unstable Experience")
-    st.dataframe(q.unstable_restaurants(filter_query), use_container_width=True)
+    st.markdown("### 💎 Hidden Gems (Low Rating, High Sentiment)")
+    df = q.hidden_gems(filter_query)
+    st.dataframe(df.head(risk_n), use_container_width=True)
+
+    st.markdown("### 🌪️ Unstable Experience (High Variance)")
+    df = q.unstable_restaurants(filter_query)
+    st.dataframe(df.head(risk_n), use_container_width=True)
 
     st.markdown("### ⭐ Best Experience Score")
-    st.dataframe(q.best_experience_restaurants(filter_query), use_container_width=True)
+    df = q.best_experience_restaurants(filter_query)
+    st.dataframe(df.head(risk_n), use_container_width=True)
 
 # ==================================================
 # ⚙️ PAGE 3 — OPERATIONS & BEHAVIOR
@@ -162,11 +172,15 @@ elif page == "🧠 Trust & Experience":
 
     st.subheader("🧠 Trust & Experience Intelligence")
 
+    trust_n = st.selectbox("Show Top Issues", [5, 10, 20], index=1)
+
     st.markdown("### 🚨 Trust Risk Restaurants")
-    st.dataframe(q.trust_risk_restaurants(filter_query), use_container_width=True)
+    df = q.trust_risk_restaurants(filter_query)
+    st.dataframe(df.head(trust_n), use_container_width=True)
 
     st.markdown("### 📉 Trust Gap Analysis")
-    st.dataframe(q.trust_gap_analysis(filter_query), use_container_width=True)
+    df = q.trust_gap_analysis(filter_query)
+    st.dataframe(df.head(trust_n), use_container_width=True)
 
     st.markdown("### 🚩 Experience Risk Flags")
     st.dataframe(q.experience_risk_flags(filter_query), use_container_width=True)
