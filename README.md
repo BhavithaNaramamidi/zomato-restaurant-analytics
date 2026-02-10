@@ -158,10 +158,10 @@ zomato-restaurant-analytics/
 ## 📦 Dataset
 
 Due to GitHub file size limitations, the dataset is not uploaded directly.
-
+```text
 📎 Dataset download link is provided here:
 👉 docs/dataset_link.md
-
+```
 ## ▶️ How to Run the Project
 1️⃣ Clone the Repository
 git clone https://github.com/your-username/zomato-restaurant-analytics.git
